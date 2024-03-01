@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioPhoenix", "AudioPhoenix\AudioPhoenix.csproj", "{87C9E59E-F80E-4743-A173-8D468AC3A4E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioData", "AudioData\AudioData.csproj", "{779A44E4-34E3-4848-B279-3F8E75A1B444}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioVisuals", "AudioVisuals\AudioVisuals.csproj", "{EEE5E29B-59A0-43B8-B7D5-63CEA6C24463}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioTest", "AudioTest\AudioTest.csproj", "{A188BDA5-E0E5-46A5-9E0B-F3CDAEB13352}"
+	ProjectSection(ProjectDependencies) = postProject
+		{779A44E4-34E3-4848-B279-3F8E75A1B444} = {779A44E4-34E3-4848-B279-3F8E75A1B444}
+		{EEE5E29B-59A0-43B8-B7D5-63CEA6C24463} = {EEE5E29B-59A0-43B8-B7D5-63CEA6C24463}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87C9E59E-F80E-4743-A173-8D468AC3A4E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87C9E59E-F80E-4743-A173-8D468AC3A4E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87C9E59E-F80E-4743-A173-8D468AC3A4E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87C9E59E-F80E-4743-A173-8D468AC3A4E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{779A44E4-34E3-4848-B279-3F8E75A1B444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{779A44E4-34E3-4848-B279-3F8E75A1B444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{779A44E4-34E3-4848-B279-3F8E75A1B444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{779A44E4-34E3-4848-B279-3F8E75A1B444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE5E29B-59A0-43B8-B7D5-63CEA6C24463}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE5E29B-59A0-43B8-B7D5-63CEA6C24463}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE5E29B-59A0-43B8-B7D5-63CEA6C24463}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE5E29B-59A0-43B8-B7D5-63CEA6C24463}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A188BDA5-E0E5-46A5-9E0B-F3CDAEB13352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A188BDA5-E0E5-46A5-9E0B-F3CDAEB13352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A188BDA5-E0E5-46A5-9E0B-F3CDAEB13352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A188BDA5-E0E5-46A5-9E0B-F3CDAEB13352}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {963135B6-4FF2-4D33-B540-6CA2421C5967}
+	EndGlobalSection
+EndGlobal
