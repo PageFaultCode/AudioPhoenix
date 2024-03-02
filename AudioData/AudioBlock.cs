@@ -93,9 +93,8 @@ namespace AudioData
         {
             int bytesRead = 0;
 
-            int bytesNeeded = GetSampleSize() * _channels.Length;
 
-            if (count <= bytesNeeded)
+            if (position - _positionOffset < _sampleCount)
             {
                 foreach (var channel in _channels)
                 {
