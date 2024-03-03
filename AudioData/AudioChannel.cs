@@ -7,12 +7,12 @@ using AudioData.Interfaces;
 
 namespace AudioData
 {
-    internal class AudioChannel<T>
+    internal class AudioChannel
     {
-        private long _bufferSize = IAudioBlock<T>.DefaultBufferSize;
+        private long _bufferSize = IAudioBlock.DefaultBufferSize;
         private long _sampleCount = 0;
 
-        public void AddSample(T sample)
+        public void AddSample(short sample)
         {
             Data[_sampleCount++] = sample;
 
@@ -28,11 +28,11 @@ namespace AudioData
             set
             {
                 _bufferSize = value;
-                Data = new T[_bufferSize];
+                Data = new short[_bufferSize];
             }
         }
 
-        public T[] Data { get; private set; } = new T[IAudioBlock<T>.DefaultBufferSize];
+        public short[] Data { get; private set; } = new short[IAudioBlock.DefaultBufferSize];
 
         public bool IsFull { get; private set; }
     }

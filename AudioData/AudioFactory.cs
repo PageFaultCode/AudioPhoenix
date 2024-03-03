@@ -22,9 +22,9 @@ namespace AudioData
         {
         }
 
-        public IAudioStream NewStream<T>(WaveFormat format)
+        public IAudioStream NewStream(WaveFormat format)
         {
-            return new AudioStream<T>(format);
+            return new AudioStream(format);
         }
 
         public IAudioStream LoadStream(string filename)
@@ -38,19 +38,19 @@ namespace AudioData
                     {
                         if (waveFileReader.WaveFormat.BitsPerSample == 8)
                         {
-                            AudioStream<byte> stream = new AudioStream<byte>(waveFileReader);
+                            AudioStream stream = new AudioStream(waveFileReader);
                             return stream;
                         }
                         else
                         {
-                            AudioStream<short> stream = new AudioStream<short>(waveFileReader);
+                            AudioStream stream = new AudioStream(waveFileReader);
                             return stream;
                         }
                         throw new Exceptions.AudioDataException($"Unhandled bits per sample: {waveFileReader.WaveFormat.BitsPerSample}");
                     }
                 case WaveFormatEncoding.IeeeFloat:
                     {
-                        AudioStream<float> stream = new AudioStream<float>(waveFileReader);
+                        AudioStream stream = new AudioStream(waveFileReader);
                         return stream;
                     }
                 default:

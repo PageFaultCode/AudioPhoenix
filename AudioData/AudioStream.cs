@@ -7,10 +7,10 @@ namespace AudioData
     /// <summary>
     /// AudioStream class to manage an audio stream
     /// </summary>
-    public class AudioStream<T> : WaveStream, IAudioStream
+    public class AudioStream : WaveStream, IAudioStream
     {
         private const long _defaultBufferLength = 44100 * 60 * 5; // 5 minutes per channel
-        private List<IAudioBlock<T>> _blocks = new List<IAudioBlock<T>>();
+        private List<IAudioBlock> _blocks = new List<IAudioBlock>();
         private WaveFormat _waveFormat = new WaveFormat(); // default to stereo 44.1k 16 bit
         private long _bufferSize = _defaultBufferLength;
         private long _position = 0;
@@ -45,7 +45,7 @@ namespace AudioData
         private void ReadBytes(WaveFileReader fileReader)
         {
             int readSize = (int)_bufferSize;
-            IAudioBlock<T> block = new AudioBlock<T>(_bufferSize, _waveFormat.Channels);
+            IAudioBlock block = new AudioBlock(_bufferSize, _waveFormat.Channels);
 
             // read the data into the stream
             // While the data block size will be for one audio sample (mono / stereo) etc.
@@ -76,7 +76,7 @@ namespace AudioData
                         // add this block
                         AddAudioBlock(block);
                         // create the next one
-                        block = new AudioBlock<T>(_bufferSize, _waveFormat.Channels);
+                        block = new AudioBlock(_bufferSize, _waveFormat.Channels);
                     }
                 }
                 position += bytesRead;
@@ -90,7 +90,7 @@ namespace AudioData
             int sampleSize = sizeof(short) * _waveFormat.Channels;
             int readSize = (int)_bufferSize / sampleSize;
 
-            IAudioBlock<T> block = new AudioBlock<T>(_bufferSize, _waveFormat.Channels);
+            IAudioBlock block = new AudioBlock(_bufferSize, _waveFormat.Channels);
 
             // read the data into the stream
             // While the data block size will be for one audio sample (mono / stereo) etc.
@@ -123,7 +123,7 @@ namespace AudioData
                     if (block.IsFull)
                     {
                         AddAudioBlock(block);
-                        block = new AudioBlock<T>(_bufferSize, _waveFormat.Channels, _blocks.Count * _bufferSize);
+                        block = new AudioBlock(_bufferSize, _waveFormat.Channels, _blocks.Count * _bufferSize);
                     }
                 }
                 position += bytesRead;
@@ -132,6 +132,19 @@ namespace AudioData
         }
         private void ReadFloats(WaveFileReader fileReader)
         {
+        }
+
+        public int ReadChannel(int channel, long position, short[] buffer, int count)
+        {
+            int samplesRead = 0;
+            var audioBlock = GetAudioBlock(position);
+
+            if ((audioBlock == null) || (channel >= audioBlock.Channels))
+                return samplesRead;
+
+            samplesRead = audioBlock.GetSamples(channel, position, buffer, count);
+
+            return samplesRead;
         }
 
         #region WAVESTREAM
@@ -155,7 +168,7 @@ namespace AudioData
         public override int Read(byte[] buffer, int offset, int count)
         {
             int totalBytesRead = 0;
-            IAudioBlock<T>? block = GetAudioBlock(_position);
+            IAudioBlock? block = GetAudioBlock(_position);
 
             if (block != null)
             {
@@ -186,12 +199,12 @@ namespace AudioData
 
         #endregion
 
-        private void AddAudioBlock(IAudioBlock<T> block)
+        private void AddAudioBlock(IAudioBlock block)
         {
             _blocks.Add(block);
         }
 
-        private IAudioBlock<T>? GetAudioBlock(long position)
+        private IAudioBlock? GetAudioBlock(long position)
         {
             if (_blocks.Count != 0)
             {

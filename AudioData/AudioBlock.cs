@@ -7,27 +7,28 @@ using AudioData.Interfaces;
 
 namespace AudioData
 {
-    internal class AudioBlock<T> : IAudioBlock<T>
+    internal class AudioBlock : IAudioBlock
     {
-        private long _bufferSize = IAudioBlock<T>.DefaultBufferSize;
+        private long _bufferSize = IAudioBlock.DefaultBufferSize;
         private long _sampleCount = 0;
         private long _positionOffset = 0;
-        private AudioChannel<T>[] _channels;
+        private AudioChannel[] _channels;
 
         public AudioBlock(long bufferSize, int numChannels, long positionOffset = 0)
         {
             _positionOffset = positionOffset;
-            _channels = new AudioChannel<T>[numChannels];
+            _channels = new AudioChannel[numChannels];
             for (int i = 0; i < numChannels; i++)
             {
-                _channels[i] = new AudioChannel<T>();
+                _channels[i] = new AudioChannel();
             }
             BufferSize = bufferSize;
             IsFull = false;
         }
 
         #region IAudioBlock
-        public void AddSample(params T[] samples)
+
+        public void AddSample(params short[] samples)
         {
             if (!IsFull)
             {
@@ -41,7 +42,7 @@ namespace AudioData
                     else
                     {
                         // fill with silence
-                        dynamic zero = 0;
+                        short zero = 0;
                         channel.AddSample(zero);
                     }
                 }
@@ -53,66 +54,50 @@ namespace AudioData
             }
         }
 
-        public void AddSample(params byte[] samples)
-        {
-            if (typeof(T).Equals(typeof(byte)))
-            {
-                var converted = samples as T[];
-                if (converted != null)
-                {
-                    AddSample(converted);
-                }
-            }
-        }
-
-        public void AddSample(params short[] samples)
-        {
-            if (typeof(T).Equals(typeof(short)))
-            {
-                var converted = samples as T[];
-                if (converted != null)
-                {
-                    AddSample(converted);
-                }
-            }
-        }
-
-        public void AddSample(params float[] samples)
-        {
-            if (typeof(T).Equals(typeof(float)))
-            {
-                var converted = samples as T[];
-                if (converted != null)
-                {
-                    AddSample(converted);
-                }
-            }
-        }
-
         public int GetSamples(long position, byte[] values, int offset, int count)
         {
             int bytesRead = 0;
-
 
             if (position - _positionOffset < _sampleCount)
             {
                 foreach (var channel in _channels)
                 {
                     // copy sample at channel[position - _positionOffset]
-                    T value = channel.Data[position - _positionOffset];
+                    short value = channel.Data[position - _positionOffset];
 
-                    if (value != null)
-                    {
-                        byte[] data = GetBytes(value);
-                        bytesRead += data.Length;
-                        Buffer.BlockCopy(data, 0, values, offset, data.Length);
-                        offset += data.Length;
-                    }
+                    byte[] data = BitConverter.GetBytes(value);
+                    bytesRead += data.Length;
+                    Buffer.BlockCopy(data, 0, values, offset, data.Length);
+                    offset += data.Length;
                 }
             }
 
             return bytesRead;
         }
+
+        public int GetSamples(int channel, long position, short[] values, int count)
+        {
+            int samplesRead = 0;
+            long offset = position - _positionOffset;
+
+            if (offset < _sampleCount)
+            {
+                if (offset + count < _sampleCount)
+                {
+                    Buffer.BlockCopy(_channels[channel].Data, (int)offset, values, 0, count * 2);
+                    samplesRead = count;
+                }
+                else // up to the end
+                {
+                    Buffer.BlockCopy(_channels[channel].Data, (int)offset, values, 0, (int)(_sampleCount - offset) * 2);
+                    samplesRead = (int)(_sampleCount - offset);
+                }
+            }
+
+            return samplesRead;
+
+        }
+
 
         public void GetSample(short[] values)
         {
@@ -166,52 +151,11 @@ namespace AudioData
             }
             set
             {
-                _channels = new AudioChannel<T>[value];
+                _channels = new AudioChannel[value];
             }
         }
 
-        public AudioChannel<T> this[int index] => _channels[index];
+        public AudioChannel this[int index] => _channels[index];
         #endregion
-
-        private int GetSampleSize()
-        {
-            int sampleSize = 0;
-
-            if (typeof(T).Equals(typeof(byte)))
-            {
-                sampleSize = 1;
-            }
-            else if (typeof(T).Equals(typeof(short)))
-            {
-                sampleSize = 2;
-            }
-            else if (typeof(T).Equals(typeof(float)))
-            {
-                sampleSize = 4;
-            }
-            return sampleSize;
-        }
-
-        private byte[] GetBytes(dynamic value)
-        {
-            byte[] results = new byte[0];
-
-            if (typeof(T).Equals(typeof(short)))
-            {
-                results = new byte[sizeof(short)];
-                results = BitConverter.GetBytes((short)value);
-            }
-            else if (typeof(T).Equals(typeof(float)))
-            {
-                results = new byte[sizeof(float)];
-                results = BitConverter.GetBytes((float)value);
-            }
-            else
-            {
-                results = new byte[1];
-                results[0] = (byte)value;
-            }
-            return results;
-        }
     }
 }

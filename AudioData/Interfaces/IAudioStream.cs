@@ -12,7 +12,8 @@ namespace AudioData.Interfaces
     {
         WaveStream WaveStream { get; }
 
-        public long SampleCount { get; }
+        long SampleCount { get; }
 
+        int ReadChannel(int channel, long position, short[] buffer, int count);
     }
 }

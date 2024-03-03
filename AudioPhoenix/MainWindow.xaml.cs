@@ -73,9 +73,10 @@ namespace AudioPhoenix
 
                 if (audioData != null)
                 {
-                    _outputPlayer = new WasapiOut(_selectedPlaybackDevice, AudioClientShareMode.Shared, true, 200);
+                    _wavePanel.Stream = audioData;
+/*                    _outputPlayer = new WasapiOut(_selectedPlaybackDevice, AudioClientShareMode.Shared, true, 200);
                     _outputPlayer.Init(audioData);
-                    _outputPlayer.Play();
+                    _outputPlayer.Play();*/
                 }
             }
         }
