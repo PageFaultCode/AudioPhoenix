@@ -61,6 +61,7 @@ namespace AudioVisuals
         public WavePanel()
         {
             TimeSpan = new TimeSpan(0, 0, 2); // 2 second default view
+            Height = 50;
 
             _waveMidPointPen.DashStyle = DashStyles.Dash;
         }
@@ -141,7 +142,7 @@ namespace AudioVisuals
                     }
                     double y1Position = (double)minExtent / _minWaveValue * midPoint;
                     double y2Position = (double)maxExtent / _maxWaveValue * midPoint;
-                    Console.WriteLine("y1: {0} y2: {1} ActualHeight: {2}", midPoint - y1Position, midPoint + y2Position, ActualHeight);
+                    //Console.WriteLine("y1: {0} y2: {1} ActualHeight: {2}", midPoint - y1Position, midPoint + y2Position, ActualHeight);
                     drawingContext.DrawLine(_waveMiddleLinePen, new Point(xPixelPosition, midPoint + y1Position), new Point((double)xPixelPosition, midPoint - y2Position));
                     xPixelPosition++;
                 }

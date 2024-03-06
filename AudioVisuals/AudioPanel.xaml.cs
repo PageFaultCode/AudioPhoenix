@@ -37,7 +37,11 @@ namespace AudioVisuals
             _wavePanels.Children.Clear();
             for (var channel = 0; channel < _stream.WaveFormat.Channels; channel++)
             {
+                var wavePanel = new WavePanel();
 
+                wavePanel.Channel = channel;
+                _wavePanels.Children.Add(wavePanel);
+                wavePanel.Stream = Stream;
             }
         }
 
