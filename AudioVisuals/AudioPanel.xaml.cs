@@ -12,12 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace AudioVisuals
 {
     using AudioData;
     using AudioData.Interfaces;
     using NAudio.Wave;
+    using System.Diagnostics;
     using System.IO;
 
     /// <summary>
@@ -25,8 +27,15 @@ namespace AudioVisuals
     /// </summary>
     public partial class AudioPanel : UserControl
     {
-        private IAudioStream _stream = new AudioStream(new WaveFormat()); // place holder
+        Pen _selectionBorderPen = new Pen(Brushes.Black, 1);
+
+        private IAudioStream _stream = new AudioStream(new WaveFormat()); // place holder   
         private TimeSpan _timeSpan = new TimeSpan(0, 0, 2);
+        private bool _selectionInProgress;
+        private Point _startingSelection;
+        private Point _endingSelection;
+        private Point _currentPosition;
+        private Brush _selectionBrush = new System.Windows.Media.SolidColorBrush(Color.FromArgb(127,0,0,127));
 
         public AudioPanel()
         {
@@ -51,25 +60,44 @@ namespace AudioVisuals
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            Console.WriteLine("Mouse down");
+            _selectionInProgress = true;
+            _startingSelection = e.GetPosition(this);
             base.OnMouseDown(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            Console.WriteLine("MM");
+            if (_selectionInProgress)
+            {
+                _currentPosition = e.GetPosition(this);
+                InvalidateVisual();
+            }
             base.OnMouseMove(e);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            Console.WriteLine("Mouse Up");
+            _selectionInProgress = false;
+            _endingSelection = e.GetPosition(this);
             base.OnMouseUp(e);
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+            if (_selectionInProgress)
+            {
+                var startPoint = _startingSelection.X < _currentPosition.X ? _startingSelection.X : _currentPosition.X;
+                var width = Math.Abs(_currentPosition.X - _startingSelection.X);
+
+//                Trace.WriteLine($"SP: {startPoint} W: {width} SS: {_startingSelection} CP: {_currentPosition}");
+                drawingContext.DrawRectangle(Brushes.Aqua, _selectionBorderPen, new Rect(startPoint, 0, width, 200));
+            }
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
