@@ -26,11 +26,62 @@ namespace AudioVisuals
     public partial class AudioPanel : UserControl
     {
         private IAudioStream _stream = new AudioStream(new WaveFormat()); // place holder
+        private TimeSpan _timeSpan = new TimeSpan(0, 0, 2);
 
         public AudioPanel()
         {
             InitializeComponent();
         }
+
+        #region User Interface
+        protected override void OnDragEnter(DragEventArgs e)
+        {
+            base.OnDragEnter(e);
+        }
+
+        protected override void OnDragLeave(DragEventArgs e)
+        {
+            base.OnDragLeave(e);
+        }
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            base.OnDragOver(e);
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            Console.WriteLine("Mouse down");
+            base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            Console.WriteLine("MM");
+            base.OnMouseMove(e);
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            Console.WriteLine("Mouse Up");
+            base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+        }
+
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+
+            foreach (WavePanel panel in _wavePanels.Children)
+            {
+                panel.InvalidateVisual();
+            }
+        }
+        #endregion
 
         private void UpdateWavePanels()
         {
@@ -41,12 +92,20 @@ namespace AudioVisuals
 
                 wavePanel.Channel = channel;
                 _wavePanels.Children.Add(wavePanel);
+                wavePanel.TimeSpan = TimeSpan;
                 wavePanel.Stream = Stream;
             }
         }
 
         #region PROPERTIES
-
+        private void UpdateTimeSpan(TimeSpan timeSpan)
+        { 
+            _timeSpan = timeSpan;
+            foreach (WavePanel panel in _wavePanels.Children)
+            {
+                panel.TimeSpan = timeSpan;
+            }
+        }
         public IAudioStream Stream
         {
             get
@@ -64,8 +123,8 @@ namespace AudioVisuals
 
         public TimeSpan TimeSpan
         {
-            get;
-            set;
+            get => _timeSpan;
+            set => UpdateTimeSpan(value);
         }
         #endregion
     }

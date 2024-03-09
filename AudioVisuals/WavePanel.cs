@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace AudioVisuals
 {
@@ -52,6 +53,7 @@ namespace AudioVisuals
         IAudioStream? _stream;
         const double _minWaveValue = (double)short.MinValue;
         const double _maxWaveValue = (double)short.MaxValue;
+        private TimeSpan _timeSpan = new TimeSpan(0, 0, 2);
 
         static WavePanel()
         {
@@ -60,7 +62,6 @@ namespace AudioVisuals
 
         public WavePanel()
         {
-            TimeSpan = new TimeSpan(0, 0, 2); // 2 second default view
             Height = 50;
 
             _waveMidPointPen.DashStyle = DashStyles.Dash;
@@ -102,9 +103,6 @@ namespace AudioVisuals
             }
         }
 
-        // We need to pull the actual channel per wavepanel and then walk it along the sample size and get away from the Read(bytes....
-        // will be faster reading actual shorts or floats
-
         protected void DrawCompressedWaveForm(DrawingContext drawingContext, double samplesToDisplay, double midPoint)
         {
             if (Stream != null)
@@ -118,13 +116,17 @@ namespace AudioVisuals
                 short[] buffer = new short[samplesPerPixel];
                 short maxExtent;
                 short minExtent;
-                Console.WriteLine("Samples Per Pixel: {0}, Stream Length: {1}", samplesPerPixel, Stream.WaveStream.Length);
+
+                long displayPosition = Position;
+
+                Trace.WriteLine($"------------------------>S:{samplesToDisplay}, MP: {midPoint}");
+
                 while (xPixelPosition < (int)ActualWidth)
                 {
                     maxExtent = short.MinValue;
                     minExtent = short.MaxValue;
                     // Read in the next samplesPerPixel assuming the position will increment for the offset
-                    int samplesRead = Stream.ReadChannel(Channel, Position, buffer, (int)samplesPerPixel);
+                    int samplesRead = Stream.ReadChannel(Channel, displayPosition, buffer, (int)samplesPerPixel);
                     if (samplesRead == 0)
                     {
                         return;
@@ -140,11 +142,13 @@ namespace AudioVisuals
                             minExtent = buffer[waveDataIndex];
                         }
                     }
-                    double y1Position = (double)minExtent / _minWaveValue * midPoint;
-                    double y2Position = (double)maxExtent / _maxWaveValue * midPoint;
-                    //Console.WriteLine("y1: {0} y2: {1} ActualHeight: {2}", midPoint - y1Position, midPoint + y2Position, ActualHeight);
-                    drawingContext.DrawLine(_waveMiddleLinePen, new Point(xPixelPosition, midPoint + y1Position), new Point((double)xPixelPosition, midPoint - y2Position));
+
+                    double y1Position = minExtent / _minWaveValue * midPoint;
+                    double y2Position = maxExtent / _maxWaveValue * midPoint;
+
+                    drawingContext.DrawLine(_waveMiddleLinePen, new Point(xPixelPosition, midPoint + y1Position), new Point(xPixelPosition, midPoint - y2Position));
                     xPixelPosition++;
+                    displayPosition += samplesPerPixel;
                 }
             }
         }
@@ -185,6 +189,11 @@ namespace AudioVisuals
         }
         #endregion
 
+        private void UpdateTimeSpan(TimeSpan timeSpan)
+        {
+            _timeSpan = timeSpan;
+            InvalidateVisual();
+        }
         #region PROPERTIES
 
         public IAudioStream? Stream
@@ -205,8 +214,8 @@ namespace AudioVisuals
 
         public TimeSpan TimeSpan
         {
-            get;
-            set;
+            get => _timeSpan;
+            set => UpdateTimeSpan(value);
         }
         #endregion
 

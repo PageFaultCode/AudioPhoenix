@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:AudioVisuals"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid MinWidth="200" MinHeight="50">
         <StackPanel x:Name="_wavePanels">
         </StackPanel>
     </Grid>
