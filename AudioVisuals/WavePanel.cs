@@ -14,6 +14,7 @@ namespace AudioVisuals
 {
     using AudioData;
     using AudioData.Interfaces;
+    using AudioVisuals.Tools;
     using NAudio.Wave;
 
     /// <summary>
@@ -54,6 +55,7 @@ namespace AudioVisuals
         const double _minWaveValue = (double)short.MinValue;
         const double _maxWaveValue = (double)short.MaxValue;
         private TimeSpan _timeSpan = new TimeSpan(0, 0, 2);
+        SelectionView? _selectionView;
 
         static WavePanel()
         {
@@ -181,10 +183,10 @@ namespace AudioVisuals
                     // Wave is zoomed where we have more than one pixel per sample
                     DrawWaveForm(drawingContext, samplesToDisplay, midPoint);
                 }
-                // Get samples per second
-                // Determine samples per pixel
-                // read bytes corresponding to samples
             }
+            
+            SelectionView?.OnRender(drawingContext, ActualHeight);
+
             DrawMarkings(drawingContext, waveHeight, midPoint, quarterPoint);
         }
         #endregion
@@ -211,6 +213,19 @@ namespace AudioVisuals
 
         public int Channel { get; set; } = 0;
         public long Position { get; set; } = 0;
+
+        internal SelectionView? SelectionView
+        {
+            get
+            {
+                return _selectionView;
+            }
+            set
+            {
+                _selectionView = value;
+                InvalidateVisual();
+            }
+        }
 
         public TimeSpan TimeSpan
         {

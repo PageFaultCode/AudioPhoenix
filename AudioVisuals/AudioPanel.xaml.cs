@@ -18,9 +18,11 @@ namespace AudioVisuals
 {
     using AudioData;
     using AudioData.Interfaces;
+    using AudioVisuals.Tools;
     using NAudio.Wave;
     using System.Diagnostics;
     using System.IO;
+    using System.Windows.Media.Media3D;
 
     /// <summary>
     /// Interaction logic for AudioPanel.xaml
@@ -90,13 +92,27 @@ namespace AudioVisuals
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
+
             if (_selectionInProgress)
             {
-                var startPoint = _startingSelection.X < _currentPosition.X ? _startingSelection.X : _currentPosition.X;
-                var width = Math.Abs(_currentPosition.X - _startingSelection.X);
+                var selectionView = new SelectionView();
 
-//                Trace.WriteLine($"SP: {startPoint} W: {width} SS: {_startingSelection} CP: {_currentPosition}");
-                drawingContext.DrawRectangle(Brushes.Aqua, _selectionBorderPen, new Rect(startPoint, 0, width, 200));
+                selectionView.Opacity = 0.5;
+                selectionView.Color = Colors.Aqua;
+                selectionView.StartPoint = _startingSelection;
+                selectionView.EndPoint = _currentPosition;
+
+                foreach (WavePanel panel in _wavePanels.Children)
+                {
+                    panel.SelectionView = selectionView;
+                }
+            }
+            else
+            {
+                foreach (WavePanel panel in _wavePanels.Children)
+                {
+                    panel.SelectionView = null;
+                }
             }
         }
 
