@@ -19,6 +19,7 @@ namespace AudioVisuals
     using AudioData;
     using AudioData.Interfaces;
     using AudioVisuals.Tools;
+    using NAudio.MediaFoundation;
     using NAudio.Wave;
     using System.Diagnostics;
     using System.IO;
@@ -36,8 +37,9 @@ namespace AudioVisuals
         private bool _selectionInProgress;
         private Point _startingSelection;
         private Point _endingSelection;
-        private Point _currentPosition;
-        private Brush _selectionBrush = new System.Windows.Media.SolidColorBrush(Color.FromArgb(127,0,0,127));
+        private Point _currentSelection;
+        private SelectionView? _selectionView;
+        private long _position;
 
         public AudioPanel()
         {
@@ -45,6 +47,7 @@ namespace AudioVisuals
         }
 
         #region User Interface
+
         protected override void OnDragEnter(DragEventArgs e)
         {
             base.OnDragEnter(e);
@@ -62,8 +65,12 @@ namespace AudioVisuals
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            _selectionInProgress = true;
-            _startingSelection = e.GetPosition(this);
+            // only on left button press
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                _selectionInProgress = true;
+                _startingSelection = e.GetPosition(this);
+            }
             base.OnMouseDown(e);
         }
 
@@ -71,16 +78,47 @@ namespace AudioVisuals
         {
             if (_selectionInProgress)
             {
-                _currentPosition = e.GetPosition(this);
-                InvalidateVisual();
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    _currentSelection = e.GetPosition(this);
+                    InvalidateVisual();
+                }
+                else
+                {
+                    _selectionInProgress = false;
+                }
             }
             base.OnMouseMove(e);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            _selectionInProgress = false;
-            _endingSelection = e.GetPosition(this);
+            if (_selectionInProgress)
+            {
+                if (e.LeftButton == MouseButtonState.Released)
+                {
+                    _endingSelection = e.GetPosition(this);
+
+                    if (_endingSelection != _startingSelection)
+                    {
+                        _selectionView = new SelectionView();
+
+                        _selectionView.Opacity = 0.5;
+                        _selectionView.Color = Colors.Aqua;
+                        _selectionView.StartPoint = _startingSelection;
+                        _selectionView.EndPoint = _endingSelection;
+                    }
+                    else
+                    {
+                        _selectionView = null;
+                    }
+                    foreach (WavePanel panel in _wavePanels.Children)
+                    {
+                        panel.SelectionView = _selectionView;
+                    }
+                }
+                _selectionInProgress = false;
+            }
             base.OnMouseUp(e);
         }
 
@@ -100,18 +138,11 @@ namespace AudioVisuals
                 selectionView.Opacity = 0.5;
                 selectionView.Color = Colors.Aqua;
                 selectionView.StartPoint = _startingSelection;
-                selectionView.EndPoint = _currentPosition;
+                selectionView.EndPoint = _currentSelection;
 
                 foreach (WavePanel panel in _wavePanels.Children)
                 {
                     panel.SelectionView = selectionView;
-                }
-            }
-            else
-            {
-                foreach (WavePanel panel in _wavePanels.Children)
-                {
-                    panel.SelectionView = null;
                 }
             }
         }
@@ -120,8 +151,11 @@ namespace AudioVisuals
         {
             base.OnRenderSizeChanged(sizeInfo);
 
+            var newHeight = sizeInfo.NewSize.Height / _wavePanels.Children.Count;
+
             foreach (WavePanel panel in _wavePanels.Children)
             {
+                panel.Height = newHeight;
                 panel.InvalidateVisual();
             }
         }
@@ -139,9 +173,11 @@ namespace AudioVisuals
                 wavePanel.TimeSpan = TimeSpan;
                 wavePanel.Stream = Stream;
             }
+            _timeLine.WaveFormat = Stream.WaveFormat;
+            _timeLine.TimeSpan = TimeSpan;
+            _timeLine.Position = Position;
         }
 
-        #region PROPERTIES
         private void UpdateTimeSpan(TimeSpan timeSpan)
         { 
             _timeSpan = timeSpan;
@@ -149,7 +185,20 @@ namespace AudioVisuals
             {
                 panel.TimeSpan = timeSpan;
             }
+            _timeLine.TimeSpan = timeSpan;
         }
+
+        private void UpdatePosition(long newPosition)
+        {
+            _position = newPosition;
+            foreach (WavePanel wavePanel in _wavePanels.Children)
+            {
+                wavePanel.Position = newPosition;
+            }
+            _timeLine.Position = newPosition;
+        }
+
+        #region PROPERTIES
         public IAudioStream Stream
         {
             get
@@ -163,7 +212,14 @@ namespace AudioVisuals
             }
         }
 
-        public long Position { get; set; }
+        public long Position
+        {
+            get { return _position; }
+            set
+            {
+                UpdatePosition(value);
+            }
+        }
 
         public TimeSpan TimeSpan
         {

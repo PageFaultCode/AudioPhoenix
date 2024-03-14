@@ -9,5 +9,6 @@
     <Grid MinWidth="200" MinHeight="50" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <StackPanel x:Name="_wavePanels">
         </StackPanel>
+        <local:TimeLine x:Name="_timeLine"></local:TimeLine>
     </Grid>
 </UserControl>

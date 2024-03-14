@@ -121,7 +121,7 @@ namespace AudioVisuals
 
                 long displayPosition = Position;
 
-                Trace.WriteLine($"------------------------>S:{samplesToDisplay}, MP: {midPoint}");
+                // Trace.WriteLine($"------------------------>S:{samplesToDisplay}, MP: {midPoint}");
 
                 while (xPixelPosition < (int)ActualWidth)
                 {
