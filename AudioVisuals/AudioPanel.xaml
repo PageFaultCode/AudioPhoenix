@@ -7,8 +7,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid MinWidth="200" MinHeight="50" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <StackPanel x:Name="_wavePanels">
+        <StackPanel Orientation="Horizontal">
+            <local:SignalLevel x:Name="_signalLevel"></local:SignalLevel>
+            <StackPanel>
+                <StackPanel x:Name="_wavePanels">
+                </StackPanel>
+                <local:TimeLine x:Name="_timeLine"></local:TimeLine>
+            </StackPanel>
         </StackPanel>
-        <local:TimeLine x:Name="_timeLine"></local:TimeLine>
     </Grid>
 </UserControl>

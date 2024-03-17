@@ -1,7 +1,5 @@
-﻿using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,55 +41,19 @@ namespace AudioVisuals
     /// Step 2)
     /// Go ahead and use your control in the XAML file.
     ///
-    ///     <MyNamespace:TimeLine/>
+    ///     <MyNamespace:SignalLevel/>
     ///
     /// </summary>
-    public class TimeLine : Control
+    public class SignalLevel : Control
     {
-        private readonly Pen _ctrlBorderPen = new(Brushes.Black, 1);
-        private long _position;
-
-        static TimeLine()
+        static SignalLevel()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(TimeLine), new FrameworkPropertyMetadata(typeof(TimeLine)));
-        }
-
-        public TimeLine()
-        {
-            Height = 10;
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SignalLevel), new FrameworkPropertyMetadata(typeof(SignalLevel)));
         }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
-
-            if (WaveFormat != null)
-            {
-                drawingContext.DrawRoundedRectangle(Brushes.Silver, _ctrlBorderPen, new Rect(0, 0, ActualWidth, ActualHeight), 2.0, 2.0);
-                // need to draw divits for each second?
-                if (WaveFormat != null)
-                {
-                    double samplesToDisplay = WaveFormat.SampleRate * TimeSpan.TotalSeconds;
-                    double samplesPerPixel = samplesToDisplay / ActualWidth;
-                }
-            }
         }
-
-        #region PROPERTIES
-        public WaveFormat? WaveFormat {  get; set; }
-
-        public long Position
-        {
-            get { return _position; } 
-            set
-            {
-                _position = value;
-                InvalidateVisual();
-            }
-        }
-        public TimeSpan TimeSpan { get; set; }
-
-        public long SamplesPerSecond { get; set; }
-        #endregion
     }
 }

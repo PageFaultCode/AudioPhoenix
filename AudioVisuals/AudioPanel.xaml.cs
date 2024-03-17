@@ -115,6 +115,7 @@ namespace AudioVisuals
                     foreach (WavePanel panel in _wavePanels.Children)
                     {
                         panel.SelectionView = _selectionView;
+                        panel.InvalidateVisual(); // make it so
                     }
                 }
                 _selectionInProgress = false;
@@ -143,6 +144,7 @@ namespace AudioVisuals
                 foreach (WavePanel panel in _wavePanels.Children)
                 {
                     panel.SelectionView = selectionView;
+                    panel.InvalidateVisual();
                 }
             }
         }
@@ -151,13 +153,15 @@ namespace AudioVisuals
         {
             base.OnRenderSizeChanged(sizeInfo);
 
-            var newHeight = sizeInfo.NewSize.Height / _wavePanels.Children.Count;
+            var newHeight = (sizeInfo.NewSize.Height - _timeLine.Height) / _wavePanels.Children.Count;
 
             foreach (WavePanel panel in _wavePanels.Children)
             {
                 panel.Height = newHeight;
+                panel.Width = ActualWidth;
                 panel.InvalidateVisual();
             }
+            _timeLine.InvalidateVisual();
         }
         #endregion
 

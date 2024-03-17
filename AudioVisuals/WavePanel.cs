@@ -65,6 +65,7 @@ namespace AudioVisuals
         public WavePanel()
         {
             Height = 50;
+            Width = 50;
 
             _waveMidPointPen.DashStyle = DashStyles.Dash;
         }
@@ -107,7 +108,7 @@ namespace AudioVisuals
 
         protected void DrawCompressedWaveForm(DrawingContext drawingContext, double samplesToDisplay, double midPoint)
         {
-            if (Stream != null)
+            if ((Stream != null) && (ActualWidth >  0))
             {
                 // Window is laid out 0,0 top left, ActualWidth, ActualHeight bottom right
                 // A compressed wave form will be vertical bars expressing the extent of the data in both positive and negative directions
@@ -191,11 +192,6 @@ namespace AudioVisuals
         }
         #endregion
 
-        private void UpdateTimeSpan(TimeSpan timeSpan)
-        {
-            _timeSpan = timeSpan;
-            InvalidateVisual();
-        }
         #region PROPERTIES
 
         public IAudioStream? Stream
@@ -207,7 +203,6 @@ namespace AudioVisuals
             set
             {
                 _stream = value;
-                InvalidateVisual();
             }
         }
 
@@ -223,14 +218,13 @@ namespace AudioVisuals
             set
             {
                 _selectionView = value;
-                InvalidateVisual();
             }
         }
 
         public TimeSpan TimeSpan
         {
             get => _timeSpan;
-            set => UpdateTimeSpan(value);
+            set => _timeSpan = value;
         }
         #endregion
 
