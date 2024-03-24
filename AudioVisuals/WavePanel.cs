@@ -64,9 +64,8 @@ namespace AudioVisuals
 
         public WavePanel()
         {
-            Height = 50;
-            Width = 50;
-
+            MinHeight = 100;
+            MinWidth = 600;
             _waveMidPointPen.DashStyle = DashStyles.Dash;
         }
 
@@ -160,35 +159,38 @@ namespace AudioVisuals
         {
             base.OnRender(drawingContext);
 
-            double waveHeight = ActualHeight - 1;
-
-            double midPoint = waveHeight / 2.0;
-            double quarterPoint = midPoint / 2.0;
-
-            // make it so
-            drawingContext.DrawRoundedRectangle(Brushes.Silver, _waveBorderPen, new Rect(0, 0, ActualWidth, waveHeight), 3.0, 3.0);
-
-            if (Stream != null)
+            if (ActualHeight != 0 && ActualWidth != 0)
             {
-                double samplesToDisplay = Stream.WaveFormat.SampleRate * TimeSpan.TotalSeconds;
+                double waveHeight = ActualHeight - 1;
 
-                // Draw wave
-                // Get total count
-                if (samplesToDisplay > ActualWidth)
+                double midPoint = waveHeight / 2.0;
+                double quarterPoint = midPoint / 2.0;
+
+                // make it so
+                drawingContext.DrawRoundedRectangle(Brushes.Silver, _waveBorderPen, new Rect(0, 0, ActualWidth, waveHeight), 3.0, 3.0);
+
+                if (Stream != null)
                 {
-                    // Wave is zoomed out where we have more samples per pixel
-                    DrawCompressedWaveForm(drawingContext, samplesToDisplay, midPoint);
+                    double samplesToDisplay = Stream.WaveFormat.SampleRate * TimeSpan.TotalSeconds;
+
+                    // Draw wave
+                    // Get total count
+                    if (samplesToDisplay > ActualWidth)
+                    {
+                        // Wave is zoomed out where we have more samples per pixel
+                        DrawCompressedWaveForm(drawingContext, samplesToDisplay, midPoint);
+                    }
+                    else
+                    {
+                        // Wave is zoomed where we have more than one pixel per sample
+                        DrawWaveForm(drawingContext, samplesToDisplay, midPoint);
+                    }
                 }
-                else
-                {
-                    // Wave is zoomed where we have more than one pixel per sample
-                    DrawWaveForm(drawingContext, samplesToDisplay, midPoint);
-                }
+
+                SelectionView?.OnRender(drawingContext, ActualHeight);
+
+                DrawMarkings(drawingContext, waveHeight, midPoint, quarterPoint);
             }
-            
-            SelectionView?.OnRender(drawingContext, ActualHeight);
-
-            DrawMarkings(drawingContext, waveHeight, midPoint, quarterPoint);
         }
         #endregion
 

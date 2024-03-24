@@ -6,14 +6,20 @@
              xmlns:local="clr-namespace:AudioVisuals"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid MinWidth="200" MinHeight="50" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <StackPanel Orientation="Horizontal">
-            <local:SignalLevel x:Name="_signalLevel"></local:SignalLevel>
-            <StackPanel>
-                <StackPanel x:Name="_wavePanels">
-                </StackPanel>
-                <local:TimeLine x:Name="_timeLine"></local:TimeLine>
-            </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="75*"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50*"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <local:SignalLevel x:Name="_signalLevel" Grid.Row="0" Grid.Column="1"></local:SignalLevel>
+        <StackPanel x:Name="_wavePanels" Grid.Row="1" Grid.Column="1">
         </StackPanel>
+        <local:TimeLine x:Name="_timeLine" Grid.Row="2" Grid.Column="1"></local:TimeLine>
     </Grid>
 </UserControl>

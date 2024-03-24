@@ -50,6 +50,7 @@ namespace AudioVisuals
     {
         private readonly Pen _ctrlBorderPen = new(Brushes.Black, 1);
         private long _position;
+        private FormattedText _text = new FormattedText("1.00", System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal), 7.5, Brushes.Black, 1.0);
 
         static TimeLine()
         {
@@ -58,7 +59,6 @@ namespace AudioVisuals
 
         public TimeLine()
         {
-            Height = 10;
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -68,11 +68,26 @@ namespace AudioVisuals
             if (WaveFormat != null)
             {
                 drawingContext.DrawRoundedRectangle(Brushes.Silver, _ctrlBorderPen, new Rect(0, 0, ActualWidth, ActualHeight), 2.0, 2.0);
+
                 // need to draw divits for each second?
                 if (WaveFormat != null)
                 {
-                    double samplesToDisplay = WaveFormat.SampleRate * TimeSpan.TotalSeconds;
-                    double samplesPerPixel = samplesToDisplay / ActualWidth;
+                    int tickCount = (int)(TimeSpan.TotalSeconds * 4); // quarter second divits
+                    int tickSpacing = (int)ActualWidth / tickCount;
+                    int xSpot = 0;
+                    for (int i = 1; i < tickCount; i++)
+                    {
+                        xSpot += tickSpacing;
+                        if (i % 4 != 0)
+                        {
+                            drawingContext.DrawLine(_ctrlBorderPen, new Point(xSpot, 0), new Point(xSpot, ActualHeight / 2));
+                        }
+                        else
+                        {
+                            drawingContext.DrawLine(_ctrlBorderPen, new Point(xSpot, 0), new Point(xSpot, ActualHeight * 0.75));
+                            drawingContext.DrawText(_text, new Point(xSpot, ActualHeight / 2));
+                        }
+                    }
                 }
             }
         }

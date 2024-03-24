@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -46,6 +47,9 @@ namespace AudioVisuals
     /// </summary>
     public class SignalLevel : Control
     {
+        private readonly Pen _ctrlBorderPen = new(Brushes.Black, 1);
+        private FormattedText _text = new FormattedText("1.00", System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal), 11.5, Brushes.Pink, 1.0);
+
         static SignalLevel()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SignalLevel), new FrameworkPropertyMetadata(typeof(SignalLevel)));
@@ -54,6 +58,7 @@ namespace AudioVisuals
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
+            drawingContext.DrawText(_text, new Point(ActualWidth / 2, ActualHeight / 2));
         }
     }
 }
