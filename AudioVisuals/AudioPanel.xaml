@@ -20,6 +20,8 @@
         <local:SignalLevel x:Name="_signalLevel" Grid.Row="0" Grid.Column="1"></local:SignalLevel>
         <StackPanel x:Name="_wavePanels" Grid.Row="1" Grid.Column="1">
         </StackPanel>
+        <local:WaveStrength Grid.Row="1" Grid.Column="0"></local:WaveStrength>
+        <local:WaveStrength Grid.Row="1" Grid.Column="2" Flipped="True"></local:WaveStrength>
         <local:TimeLine x:Name="_timeLine" Grid.Row="2" Grid.Column="1"></local:TimeLine>
     </Grid>
 </UserControl>

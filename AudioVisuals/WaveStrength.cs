@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,17 +41,16 @@ namespace AudioVisuals
     /// Step 2)
     /// Go ahead and use your control in the XAML file.
     ///
-    ///     <MyNamespace:SignalLevel/>
+    ///     <MyNamespace:WaveStrength/>
     ///
     /// </summary>
-    public class SignalLevel : Control
+    public class WaveStrength : Control
     {
-        private readonly Pen _ctrlBorderPen = new (Brushes.Black, 1);
-        private readonly SolidColorBrush _volumeBrush = new (Colors.GreenYellow);
+        private readonly Pen _ctrlMarkerPen = new(Brushes.Black, 1);
 
-        static SignalLevel()
+        static WaveStrength()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SignalLevel), new FrameworkPropertyMetadata(typeof(SignalLevel)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(WaveStrength), new FrameworkPropertyMetadata(typeof(WaveStrength)));
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -61,21 +59,25 @@ namespace AudioVisuals
 
             if (ActualWidth > 0 && ActualHeight > 0)
             {
-                drawingContext.DrawRectangle(Brushes.DarkGray, _ctrlBorderPen, new Rect(new Point(0, 0), new Point(ActualWidth, ActualHeight)));
+                drawingContext.DrawRectangle(Brushes.DarkGray, null, new Rect(0, 0, ActualWidth, ActualHeight));
 
-                // Upto 10 blocks with 10% spacing between
-                double blockSize = ActualWidth / 10.0;
-                double blockWidth = blockSize * 0.9;
-                double spacer = blockSize * 0.05;
-
-                for (int i = 0; i < (int)Volume; i++)
+                // We need a mark at midpoint to indicate the 0 level
+                // then +- 6db == 0.5 volume out of 1.0
+                if (Flipped)
                 {
-                    double offset = blockSize * i + spacer;
-                    drawingContext.DrawRectangle(_volumeBrush, null, new Rect(new Point(offset, 3.0), new Point(offset + blockWidth, ActualHeight - 3.0)));
+                    drawingContext.DrawLine(_ctrlMarkerPen, new Point(0.0, ActualHeight / 2.0), new Point(ActualWidth * 0.8, ActualHeight / 2.0));
+                    drawingContext.DrawLine(_ctrlMarkerPen, new Point(0.0, ActualHeight / 4.0), new Point(ActualWidth * 0.5, ActualHeight / 4.0));
+                    drawingContext.DrawLine(_ctrlMarkerPen, new Point(0.0, ActualHeight * 0.75), new Point(ActualWidth * 0.5, ActualHeight * 0.75));
+                }
+                else
+                {
+                    drawingContext.DrawLine(_ctrlMarkerPen, new Point(ActualWidth * 0.2, ActualHeight / 2.0), new Point(ActualWidth, ActualHeight / 2.0));
+                    drawingContext.DrawLine(_ctrlMarkerPen, new Point(ActualWidth * 0.5, ActualHeight / 4.0), new Point(ActualWidth, ActualHeight / 4.0));
+                    drawingContext.DrawLine(_ctrlMarkerPen, new Point(ActualWidth * 0.5, ActualHeight * 0.75), new Point(ActualWidth, ActualHeight * 0.75));
                 }
             }
         }
 
-        public double Volume { get; set; } = 0.0;
+        public bool Flipped { get; set; } = false;
     }
 }
