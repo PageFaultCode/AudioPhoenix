@@ -46,11 +46,34 @@ namespace AudioVisuals
     /// </summary>
     public class WaveStrength : Control
     {
+        static Dictionary<string, FormattedText> _textSamples;
+        static object _textSamplesLock = new object();
+
         private readonly Pen _ctrlMarkerPen = new(Brushes.Black, 1);
+        private readonly Typeface _typeFace = new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+        private FormattedText _text = new FormattedText("1.00", System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal), 7.5, Brushes.Black, 1.0);
 
         static WaveStrength()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(WaveStrength), new FrameworkPropertyMetadata(typeof(WaveStrength)));
+            _textSamples = new Dictionary<string, FormattedText>();
+        }
+
+        public static FormattedText GetText(string text)
+        {
+            lock( _textSamplesLock)
+            {
+                if (_textSamples.TryGetValue(text, out var textSample))
+                {
+                    return textSample;
+                }
+
+                var newTextSample = new FormattedText(text, System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(new FontFamily("Arial"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal), 7.5, Brushes.Black, 1.0);
+
+                _textSamples[text] = newTextSample;
+
+                return newTextSample;
+            }
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -61,7 +84,7 @@ namespace AudioVisuals
             {
                 drawingContext.DrawRectangle(Brushes.DarkGray, null, new Rect(0, 0, ActualWidth, ActualHeight));
 
-                // We need a mark at midpoint to indicate the 0 level
+                // We need a mark at midpoint to indicate the 0 level or perhaps infinity and beyond
                 // then +- 6db == 0.5 volume out of 1.0
                 if (Flipped)
                 {
@@ -78,6 +101,13 @@ namespace AudioVisuals
             }
         }
 
+        private double ConvertLevelToDecibels(double level)
+        {
+            return 20.0 * Math.Log10(level);
+        }
+
         public bool Flipped { get; set; } = false;
+
+        public bool Decibels { get; set; } = false;
     }
 }
